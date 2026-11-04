@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>영어 단어 연습장</title>
+<style>
+:root{--bg:#f5f7ff;--card:#fff;--ink:#20243a;--muted:#6b7280;--accent:#6558e8;--line:#e5e7f2;--good:#14804a;--bad:#b42318}
+*{box-sizing:border-box}body{margin:0;background:linear-gradient(135deg,#f5f7ff,#f4efff);font-family:system-ui,-apple-system,"Segoe UI",sans-serif;color:var(--ink);padding:24px}
+main{max-width:760px;margin:auto}.top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:20px}.eyebrow{font-size:12px;letter-spacing:.12em;color:var(--accent);font-weight:800}.top h1{margin:4px 0;font-size:clamp(25px,5vw,36px)}.pill{background:#e9e7ff;color:#4e42c6;border-radius:99px;padding:8px 12px;font-size:13px;font-weight:700}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px;box-shadow:0 8px 24px #30246a0a}.stat{text-align:center}.stat span{display:block;font-size:12px;color:var(--muted)}.stat strong{display:block;font-size:26px;margin-top:4px}
+.tabs{display:flex;gap:8px;margin:12px 0}.tabs button{flex:1}.active,button.primary{background:var(--accent);color:white;border-color:var(--accent)!important}
+button,input{font:inherit}button{border:1px solid var(--line);background:white;color:var(--ink);padding:11px 14px;border-radius:12px;font-weight:700;cursor:pointer}button:disabled{opacity:.45;cursor:not-allowed}button:hover:not(:disabled){filter:brightness(.97)}
+.quiz{margin-bottom:14px}.quizhead{display:flex;justify-content:space-between;color:var(--muted);font-size:13px}.track{height:7px;background:#eeeef8;border-radius:99px;overflow:hidden;margin:12px 0 22px}.bar{height:100%;width:0;background:var(--accent);transition:width .2s}.prompt{text-align:center;padding:18px 0 24px}.prompt small{color:var(--muted)}.prompt h2{font-size:clamp(27px,6vw,40px);margin:12px 0}.prompt p{color:var(--muted);margin:0}.answerrow{display:flex;gap:8px}input{min-width:0;width:100%;padding:13px;border:1px solid var(--line);border-radius:12px;background:#fff;color:var(--ink)}input:focus{outline:2px solid #c9c4ff;border-color:var(--accent)}.answerrow button{white-space:nowrap}.feedback{min-height:26px;text-align:center;font-weight:700;margin:12px 0}.nav{display:flex;gap:8px}.nav button{flex:1}.section-title{margin:0 0 12px}.word-list{display:grid;gap:8px}.word{display:flex;align-items:center;justify-content:space-between;gap:10px;border-bottom:1px solid var(--line);padding:8px 0}.word span{overflow-wrap:anywhere}.word small{color:var(--muted)}.delete{padding:6px 9px;font-size:12px}.addform{display:grid;grid-template-columns:1fr 1fr auto;gap:8px;margin-top:14px}.note{font-size:12px;color:var(--muted);margin:10px 0 0}.footer{display:flex;justify-content:flex-end;margin-top:12px}.footer button{font-size:12px;color:var(--muted)}@media(max-width:520px){body{padding:14px}.card{padding:14px}.addform{grid-template-columns:1fr 1fr}.addform button{grid-column:1/-1}.answerrow{flex-direction:column}.stats strong{font-size:22px}}
+</style>
+</head>
+<body>
+<main>
+ <header class="top"><div><div class="eyebrow">MY VOCABULARY</div><h1>영어 단어 연습장</h1><div style="color:var(--muted)">한 번에 한 단어씩, 차근차근 외워 보자.</div></div><span class="pill">랜덤 단어 퀴즈</span></header>
+ <section class="stats">
+  <div class="card stat"><span>전체 단어</span><strong id="total">7</strong></div>
+  <div class="card stat"><span>맞힌 단어</span><strong id="correctCount">0</strong></div>
+  <div class="card stat"><span>정답률</span><strong id="rate">0%</strong></div>
+ </section>
+ <div class="tabs"><button id="quizTab" class="active">뜻 보고 영어 맞히기</button><button id="cardTab">단어 카드</button></div>
+ <section class="card quiz">
+  <div class="quizhead"><span id="modeLabel">뜻 보고 영어 맞히기</span><span id="progress">1 / 7</span></div>
+  <div class="track"><div class="bar" id="bar"></div></div>
+  <div class="prompt"><small id="promptHint">이 뜻에 맞는 영어 단어는?</small><h2 id="question">하나로 합치다</h2><p id="subhint">영어 단어를 입력해 봐!</p></div>
+  <div id="answerArea" class="answerrow"><input id="answer" autocomplete="off" placeholder="영어 단어를 입력하세요"><button id="check" class="primary">정답 확인</button></div>
+  <div id="feedback" class="feedback" aria-live="polite"></div>
+  <div class="nav"><button id="next" disabled>다음 문제 →</button><button id="shuffle">순서 섞기 ↻</button></div>
+ </section>
+ <section class="card"><h3 class="section-title">나의 단어 목록</h3><div id="wordList" class="word-list"></div>
+  <form id="addForm" class="addform"><input id="newEnglish" placeholder="영어 단어" required><input id="newKorean" placeholder="한국어 뜻" required><button class="primary">단어 추가</button></form>
+  <p class="note">단어를 추가하거나 삭제할 수 있어. 목록과 학습 기록은 이 브라우저에 저장돼.</p>
+ </section>
+ <div class="footer"><button id="reset">학습 기록 초기화</button></div>
+</main>
+<script>
+(()=>{
+const initial=[['unite','하나로 합치다'],['impressive','인상적인'],['encounter','마주치다, 만나다'],['virtual','가상의'],['eagerly','간절히, 열심히'],['nationality','국적'],['lyrics','노래 가사']];
+let words;try{words=JSON.parse(localStorage.getItem('vocabWords'))||initial.map(([en,ko])=>({en,ko}))}catch{words=initial.map(([en,ko])=>({en,ko}))}
+let correct=new Set(),wrong=new Set(),order=[],index=0,mode='quiz',locked=false,finished=false;
+const $=id=>document.getElementById(id);
+function save(){try{localStorage.setItem('vocabWords',JSON.stringify(words))}catch{}}
+function shuffle(a){a=[...a];for(let i=a.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+function stats(){$('total').textContent=words.length;$('correctCount').textContent=correct.size;let attempted=new Set([...correct,...wrong]).size;$('rate').textContent=(attempted?Math.round(correct.size/attempted*100):0)+'%'}
+function start(){order=shuffle(words.map((_,i)=>i));index=0;locked=false;finished=false;render()}
+function render(){stats();drawWords();$('quizTab').classList.toggle('active',mode==='quiz');$('cardTab').classList.toggle('active',mode==='card');$('modeLabel').textContent=mode==='quiz'?'뜻 보고 영어 맞히기':'단어 카드';$('bar').style.width=(order.length?index/order.length*100:0)+'%';$('progress').textContent=order.length?`${Math.min(index+1,order.length)} / ${order.length}`:'0 / 0';
+if(!words.length){$('question').textContent='단어를 추가해 줘!';$('promptHint').textContent='나의 단어장';$('subhint').textContent='아래 입력창에서 단어를 추가할 수 있어.';$('answerArea').innerHTML='';$('next').disabled=true;return}
+if(index>=order.length){finish();return}
+let w=words[order[index]];$('question').textContent=mode==='quiz'?w.ko:w.en;$('promptHint').textContent=mode==='quiz'?'이 뜻에 맞는 영어 단어는?':'영어 단어의 뜻을 생각해 봐!';$('subhint').textContent=mode==='quiz'?'영어 단어를 입력해 봐!':'정답 확인하기를 누르면 뜻이 보여.';
+$('answerArea').innerHTML=mode==='quiz'?'<input id="answer" autocomplete="off" placeholder="영어 단어를 입력하세요"><button id="check" class="primary">정답 확인</button>':'<button id="reveal" class="primary" style="width:100%">뜻 확인하기</button>';
+$('feedback').textContent='';$('feedback').style.color='var(--ink)';$('next').disabled=true;$('next').textContent='다음 문제 →';locked=false;
+$('check')?.addEventListener('click',check);$('answer')?.addEventListener('keydown',e=>{if(e.key==='Enter')check()});$('reveal')?.addEventListener('click',()=>{if(locked)return;locked=true;$('feedback').textContent='뜻: '+w.ko;$('next').disabled=false});
+}
+function check(){if(locked)return;let input=$('answer').value.trim().toLowerCase();if(!input)return;let w=words[order[index]];locked=true;if(input===w.en.toLowerCase()){correct.add(w.en);wrong.delete(w.en);$('feedback').textContent='정답이야! 🎉';$('feedback').style.color='var(--good)'}else{wrong.add(w.en);$('feedback').textContent='아쉬워! 정답은 '+w.en;$('feedback').style.color='var(--bad)'}$('answer').disabled=true;$('check').disabled=true;$('next').disabled=false;stats()}
+function finish(){finished=true;$('bar').style.width='100%';$('progress').textContent='완료!';$('question').textContent='학습 완료! 🎉';$('promptHint').textContent='오늘의 학습 결과';$('subhint').textContent=`맞힌 단어 ${correct.size}개 / 전체 ${words.length}개`;$('answerArea').innerHTML='<button id="retry" class="primary" style="width:100%">전체 다시 도전하기</button><button id="wrongOnly" style="width:100%">틀린 단어만 복습</button>';$('retry').onclick=start;$('wrongOnly').onclick=()=>{let ids=words.map((w,i)=>wrong.has(w.en)?i:-1).filter(i=>i>=0);if(!ids.length){$('feedback').textContent='틀린 단어가 없어!';return}order=shuffle(ids);index=0;finished=false;render()};$('feedback').textContent=`정답률 ${words.length?Math.round(correct.size/words.length*100):0}%`;$('next').disabled=true;stats()}
+function drawWords(){$('wordList').innerHTML='';words.forEach((w,i)=>{let row=document.createElement('div');row.className='word';let label=document.createElement('span');label.textContent=w.en+' — '+w.ko;let del=document.createElement('button');del.className='delete';del.textContent='삭제';del.onclick=()=>{words.splice(i,1);correct.delete(w.en);wrong.delete(w.en);save();start()};row.append(label,del);$('wordList').append(row)})}
+$('next').onclick=()=>{index++;render()};$('shuffle').onclick=start;$('quizTab').onclick=()=>{mode='quiz';start()};$('cardTab').onclick=()=>{mode='card';start()};
+$('addForm').addEventListener('submit',e=>{e.preventDefault();let en=$('newEnglish').value.trim(),ko=$('newKorean').value.trim();if(words.some(w=>w.en.toLowerCase()===en.toLowerCase())){alert('이미 있는 단어야!');return}words.push({en,ko});save();$('newEnglish').value='';$('newKorean').value='';start()});
+$('reset').onclick=()=>{correct.clear();wrong.clear();start()};start();
+})();
+</script>
+</body>
+</html>
